@@ -1,0 +1,37 @@
+###########################################################
+#
+# Simple Makefile for Operating Systems Project 1
+# tcush
+#
+# (C Version)
+#
+###########################################################
+.SUFFIXES: .h .c .l .o
+
+CC = gcc
+CFLAGS = -g
+LEX = flex
+LIBS = -lfl
+RM = /bin/rm
+RMFLAGS = -f
+
+EXE = tcush
+OBJS = tcush.o lex.yy.o
+
+$(EXE): $(OBJS)
+	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
+
+tcush.o: tcush.c
+	$(CC) $(CFLAGS) -c $<
+
+lex.yy.o: lex.yy.c
+	$(CC) $(CFLAGS) -c $<
+
+lex.yy.c: scan.l
+	$(LEX) $<
+
+clean:
+	$(RM) $(RMFLAGS) *.o *~ tcush lex.yy.c
+
+
+
