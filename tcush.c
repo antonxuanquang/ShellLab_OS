@@ -44,7 +44,8 @@ extern char **gettoks();
 // Function Prototypes
 //
 //*********************************************************
-
+bool isInternal(char **toks);
+void handleExteral(char **toks);
 
 
 //*********************************************************
@@ -74,7 +75,7 @@ int main( int argc, char *argv[] )
   // getlogin_r(prompt, promptBufsize);
 
   /* put signal catching functions here */
-  signal(SIGINT, SIG_IGN);
+  // signal(SIGINT, SIG_IGN);
   signal(SIGTSTP, SIG_IGN);
   signal(SIGQUIT, SIG_IGN);
   
@@ -92,16 +93,44 @@ int main( int argc, char *argv[] )
         break;
 
       /* if internal commands, execute them,else handle system calls */ 
+      if (!isInternal(toks)) {
+        handleExteral(toks);
+      }
+      
+
+
+
+
 
       /* simple loop to echo all arguments */
-  	  for( ii=0; toks[ii] != NULL; ii++ ) {
-	      printf( "Argument %d: %s\n", ii, toks[ii] );
-	    }
-
-  	  
+  	  // for( ii=0; toks[ii] != NULL; ii++ ) {
+	    //   printf( "Argument %d: %s\n", ii, toks[ii] );
+	    // }
   	}
   }
 
   /* return to calling environment */
   return(retval);
+}
+
+bool isInternal(char **toks) {
+  bool flag = true;
+  char* command = toks[0];
+  if (strcmp(command, "history") == 0) {
+    printf("%s\n", command);
+  }  else if (strcmp(command, "forweb") == 0) {
+    printf("%s\n", command);
+  } else if (strcmp(command, "nls") == 0) {
+    printf("%s\n", command);
+  } else if (strcmp(command, "fil") == 0) {
+    
+  } else {
+    flag = false;
+  }
+
+  return flag;
+}
+
+void handleExteral(char **toks) {
+  printf("external\n");
 }
