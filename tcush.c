@@ -101,10 +101,6 @@ int main( int argc, char *argv[] )
       }
       
 
-
-
-
-
       /* simple loop to echo all arguments */
   	  // for( ii=0; toks[ii] != NULL; ii++ ) {
 	    //   printf( "Argument %d: %s\n", ii, toks[ii] );
@@ -155,7 +151,8 @@ void handleExternal(char **toks) {
       execvp(toks[0], toks);
       printf("%s -- Command not found\n", toks[0]);  
     } else if (pid > 0){
-      wait(NULL);
+      int status;
+      waitpid(pid, &status, 0);
     }
   }
 }
