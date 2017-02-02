@@ -18,6 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #define STRMYQUIT "myquit"
@@ -45,7 +46,7 @@ extern char **gettoks();
 //
 //*********************************************************
 bool isInternal(char **toks);
-void handleExteral(char **toks);
+void handleExternal(char **toks);
 
 
 //*********************************************************
@@ -94,7 +95,7 @@ int main( int argc, char *argv[] )
 
       /* if internal commands, execute them,else handle system calls */ 
       if (!isInternal(toks)) {
-        handleExteral(toks);
+        handleExternal(toks);
       }
       
 
@@ -123,7 +124,7 @@ bool isInternal(char **toks) {
   } else if (strcmp(command, "nls") == 0) {
     printf("%s\n", command);
   } else if (strcmp(command, "fil") == 0) {
-    
+    printf("%s\n", command);
   } else {
     flag = false;
   }
@@ -131,6 +132,14 @@ bool isInternal(char **toks) {
   return flag;
 }
 
-void handleExteral(char **toks) {
-  printf("external\n");
+void handleExternal(char **toks) {
+  int pid = fork();
+  if (pid == 0) {
+    execvp(toks[0], toks);
+    printf("%s -- Command not found\n", toks[0]);
+  } else if (pid > 0){
+    wait(NULL);
+  } else {
+    printf("Fork error!!!\n");
+  }
 }
