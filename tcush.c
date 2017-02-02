@@ -47,6 +47,8 @@ extern char **gettoks();
 //*********************************************************
 bool isInternal(char **toks);
 void handleExternal(char **toks);
+bool isBackground(char **toks);
+
 
 
 //*********************************************************
@@ -128,18 +130,50 @@ bool isInternal(char **toks) {
   } else {
     flag = false;
   }
-
   return flag;
 }
 
 void handleExternal(char **toks) {
   int pid = fork();
-  if (pid == 0) {
-    execvp(toks[0], toks);
-    printf("%s -- Command not found\n", toks[0]);
-  } else if (pid > 0){
-    wait(NULL);
-  } else {
+
+  // when can't fork more processes
+  if (pid < 0) {
     printf("Fork error!!!\n");
+    return;
   }
+
+  // in background
+  if (isBackground(toks)) {
+    if (pid == 0) {
+      execvp(toks[0], toks);
+      printf("%s -- Command not found\n", toks[0]);  
+    }
+
+  // in foreground
+  } else {
+    if (pid == 0) {
+      execvp(toks[0], toks);
+      printf("%s -- Command not found\n", toks[0]);  
+    } else if (pid > 0){
+      wait(NULL);
+    }
+  }
+}
+
+bool isBackground(char **toks) {
+  int i;
+  bool flag = false;
+
+  // get the last argument
+  for (i = 0; toks[i] != '\0'; i++)
+    ;
+  char *last_command = toks[--i];
+
+  // check the flag. If there is an & in the end, remove the &
+  if (strcmp(last_command, "&") == 0 && i >= 1) {
+    toks[i] = '\0';
+    flag = true;
+  }
+
+  return flag;
 }

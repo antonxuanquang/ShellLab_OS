@@ -1,3 +1,8 @@
+echo "Test foreground"
 ls
-ls
-ls
+echo ''
+echo ''
+echo ''
+echo "Test background"
+myquit
+EOF
