@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "main.h"
 
 #define STRMYQUIT "myquit"
 
@@ -39,7 +40,6 @@ typedef enum{ false, true } bool;
 //*********************************************************
 extern char **gettoks();
 
-
 //*********************************************************
 //
 // Function Prototypes
@@ -48,8 +48,14 @@ extern char **gettoks();
 bool isInternal(char **toks);
 void handleExternal(char **toks);
 bool isBackground(char **toks);
+void excuteCommand(char **toks);
 
-
+//*********************************************************
+//
+// Global variables
+//
+//*********************************************************
+struct history_node *history_list = NULL;
 
 //*********************************************************
 //
@@ -64,6 +70,7 @@ int main( int argc, char *argv[] )
   int retval;
   char *prompt;
   char *username;
+  
 
   if ((username = getlogin()) == NULL) {
     fprintf(stderr, "Get of user information failed.\n"); exit(1);
@@ -95,6 +102,8 @@ int main( int argc, char *argv[] )
   	  if( !strcmp( toks[0], STRMYQUIT ))
         break;
 
+      push_command(&history_list, join_tokens(toks));
+
       /* if internal commands, execute them,else handle system calls */ 
       if (!isInternal(toks)) {
         handleExternal(toks);
@@ -116,7 +125,7 @@ bool isInternal(char **toks) {
   bool flag = true;
   char* command = toks[0];
   if (strcmp(command, "history") == 0) {
-    printf("%s\n", command);
+    print_command(history_list);
   }  else if (strcmp(command, "forweb") == 0) {
     printf("%s\n", command);
   } else if (strcmp(command, "nls") == 0) {
@@ -141,15 +150,13 @@ void handleExternal(char **toks) {
   // in background
   if (isBackground(toks)) {
     if (pid == 0) {
-      execvp(toks[0], toks);
-      printf("%s -- Command not found\n", toks[0]);  
+      excuteCommand(toks);
     }
 
   // in foreground
   } else {
     if (pid == 0) {
-      execvp(toks[0], toks);
-      printf("%s -- Command not found\n", toks[0]);  
+      excuteCommand(toks);
     } else if (pid > 0){
       int status;
       waitpid(pid, &status, 0);
@@ -173,4 +180,9 @@ bool isBackground(char **toks) {
   }
 
   return flag;
+}
+
+void excuteCommand(char **toks) {
+  execvp(toks[0], toks);
+  printf("%s -- Command not found\n", toks[0]);
 }

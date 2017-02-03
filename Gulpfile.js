@@ -9,10 +9,12 @@ gulp.task('compile', shell.task([
 
 gulp.task('watch', function() {
     gulp.watch('./*.c', ['compile']);
+    gulp.watch('./*.h', ['compile']);
 });
 
 
 
 gulp.task('default' ,function() {
     gulp.watch('./*.c', ['compile']);
+    gulp.watch('./*.h', ['compile']);
 });

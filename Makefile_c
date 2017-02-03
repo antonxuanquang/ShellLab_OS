@@ -16,12 +16,12 @@ RM = /bin/rm
 RMFLAGS = -f
 
 EXE = tcush
-OBJS = tcush.o lex.yy.o
+OBJS = tcush.o lex.yy.o history.o
 
 $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
-tcush.o: tcush.c
+.c.o:
 	$(CC) $(CFLAGS) -c $<
 
 lex.yy.o: lex.yy.c
