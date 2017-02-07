@@ -127,7 +127,7 @@ bool isInternal(char **toks) {
   if (strcmp(command, "history") == 0) {
     print_command(history_list);
   }  else if (strcmp(command, "forweb") == 0) {
-    forweb(toks[1]);
+    forweb(toks);
   } else if (strcmp(command, "nls") == 0) {
     printf("%s\n", command);
   } else if (strcmp(command, "fil") == 0) {
