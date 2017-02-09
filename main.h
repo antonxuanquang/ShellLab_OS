@@ -10,9 +10,6 @@
 //
 //*********************************************************
 
-
-
-
 //*********************************************************
 //
 // Extern Declarations
@@ -25,7 +22,7 @@ extern char **gettoks();
 // Function Prototypes
 //
 //*********************************************************
-bool isInternal(char **toks);
+bool handleInternal(char **toks);
 void handleExternal(char **toks);
 bool isBackground(char **toks);
 void excuteCommand(char **toks);

@@ -11,7 +11,7 @@
 CC = gcc
 CFLAGS = -g
 LEX = flex
-LIBS = -lfl
+LIBS = -ll # MAC compiler wants -ll instead of -lfl
 RM = /bin/rm
 RMFLAGS = -f
 
@@ -32,6 +32,3 @@ lex.yy.c: scan.l
 
 clean:
 	$(RM) $(RMFLAGS) *.o *~ tcush lex.yy.c
-
-
-
