@@ -6,7 +6,6 @@
 //
 //*********************************************************
 
-
 //*********************************************************
 //
 // Includes and Defines
@@ -24,7 +23,6 @@
 
 #define STRMYQUIT "myquit"
 
-
 //*********************************************************
 //
 // Global variables
@@ -37,15 +35,16 @@ struct history_node *history_list = NULL;
 // Main Function
 //
 //*********************************************************
-int main( int argc, char *argv[] )
-{
-  /* local variables */
+int main(int argc, char *argv[]) {
   int ii;
   char **toks;
   int retval;
+  int input;
+  int output;
   char *prompt;
   char *username;
-  
+  char *output_filename;
+  char *input_filename;
 
   if ((username = getlogin()) == NULL) {
     fprintf(stderr, "Get of user information failed.\n"); exit(1);
@@ -57,48 +56,71 @@ int main( int argc, char *argv[] )
   ii = 0;
   toks = NULL;
   retval = 0;
-  // getlogin_r(prompt, promptBufsize);
 
   /* put signal catching functions here */
   // signal(SIGINT, SIG_IGN);
   signal(SIGTSTP, SIG_IGN);
   signal(SIGQUIT, SIG_IGN);
-  
-  /* main (infinite) loop */
-  while( true ) {
 
-    /* print prompt*/
+  while( true ) {
     printf("%s", prompt);
 
-    /* get arguments */
-    toks = gettoks();
-    if( toks[0] != NULL )	{
-      /* if want to quit, quit first*/
-  	  if( !strcmp( toks[0], STRMYQUIT ))
-        break;
+    toks = gettoks(); // get arguments
+    if (toks[0] == NULL) continue; // No input
+    if (strcmp(toks[0], STRMYQUIT) == 0) break; // Dr. Scherger wants out!
 
-      push_command(&history_list, join_tokens(toks));
+    // Handle internal commands
+    if (handleInternal(toks)) {
+      continue;
+    }
 
-      /* if internal commands, execute them,else handle system calls */ 
-      if (!isInternal(toks)) {
-        handleExternal(toks);
-      }
-      
+    // Check redirected input
+    input = redirect_input(toks, &input_filename);
 
-      /* simple loop to echo all arguments */
-  	  // for( ii=0; toks[ii] != NULL; ii++ ) {
-	    //   printf( "Argument %d: %s\n", ii, toks[ii] );
-	    // }
-  	}
+    switch(input) {
+    case -1:
+      printf("Syntax error!\n");
+      continue;
+      break;
+    case 0:
+      break;
+    case 1:
+      printf("Redirecting input from: %s\n", input_filename);
+      break;
+    }
+
+    // Check redirected output
+    output = redirect_output(toks, &output_filename);
+
+    switch(output) {
+    case -1:
+      printf("Syntax error!\n");
+      continue;
+      break;
+    case 0:
+      break;
+    case 1:
+      printf("Redirecting output to: %s\n", output_filename);
+      break;
+    }
+
+    push_command(&history_list, join_tokens(toks));
+    handleExternal(toks, input, input_filename, output, output_filename);
+
+    // simple loop to echo all arguments
+	  // for( ii=0; toks[ii] != NULL; ii++ ) {
+    //   printf( "Argument %d: %s\n", ii, toks[ii] );
+    // }
   }
 
   /* return to calling environment */
   return(retval);
 }
 
-bool isInternal(char **toks) {
-  bool flag = true;
+bool handleInternal(char **toks) {
+  bool isInternal = true;
   char* command = toks[0];
+
   if (strcmp(command, "history") == 0) {
     print_command(history_list);
   }  else if (strcmp(command, "forweb") == 0) {
@@ -108,12 +130,14 @@ bool isInternal(char **toks) {
   } else if (strcmp(command, "fil") == 0) {
     fil(toks);
   } else {
-    flag = false;
+    isInternal = false;
   }
-  return flag;
+
+  return isInternal;
 }
 
-void handleExternal(char **toks) {
+void handleExternal(char **toks, int input, char *input_filename, int output,
+                    char *output_filename) {
   int pid = fork();
 
   // when can't fork more processes
@@ -122,39 +146,36 @@ void handleExternal(char **toks) {
     return;
   }
 
-  // in background
-  if (isBackground(toks)) {
-    if (pid == 0) {
-      excuteCommand(toks);
-    }
+  if (pid == 0) {
+    // set up redirections
+    if (input) freopen(input_filename, "r", stdin);
+    if (output) freopen(output_filename, "w+", stdout);
 
-  // in foreground
-  } else {
-    if (pid == 0) {
-      excuteCommand(toks);
-    } else if (pid > 0){
-      int status;
-      waitpid(pid, &status, 0);
-    }
+    excuteCommand(toks);
+    exit(-1);
+  }
+
+  if (!isBackground(toks) && pid > 0) {
+    int status;
+    waitpid(pid, &status, 0);
   }
 }
 
 bool isBackground(char **toks) {
   int i;
-  bool flag = false;
+  bool isInBackground = false;
 
   // get the last argument
-  for (i = 0; toks[i] != '\0'; i++)
-    ;
+  for (i = 0; toks[i] != '\0'; i++);
   char *last_command = toks[--i];
 
   // check the flag. If there is an & in the end, remove the &
   if (strcmp(last_command, "&") == 0 && i >= 1) {
-    toks[i] = '\0';
-    flag = true;
+    toks[i] = NULL;
+    isInBackground = true;
   }
 
-  return flag;
+  return isInBackground;
 }
 
 void excuteCommand(char **toks) {
