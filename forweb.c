@@ -1,8 +1,3 @@
-#include <stdio.h>
-#include <dirent.h> 
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
 #include "forweb.h"
 
 /*
@@ -11,7 +6,7 @@
 
 void forweb(char **toks) {
 	if (toks[1] == NULL) {
-		printf("usage: %s <path>\n", toks[0]);
+		printf("usage: %s <dirname>\n", toks[0]);
 	} else {
 		change_permission_rec(toks[1]);
 	}

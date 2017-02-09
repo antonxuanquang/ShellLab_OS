@@ -16,7 +16,7 @@ RM = /bin/rm
 RMFLAGS = -f
 
 EXE = tcush
-OBJS = tcush.o lex.yy.o history.o forweb.o
+OBJS = tcush.o lex.yy.o history.o forweb.o nls.o fil.o
 
 $(EXE): $(OBJS)
 	$(CC) $(CFLAGS) $^ -o $@ $(LIBS)

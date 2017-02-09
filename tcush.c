@@ -27,31 +27,6 @@
 
 //*********************************************************
 //
-// Type Declarations
-//
-//*********************************************************
-typedef enum{ false, true } bool;
-
-
-//*********************************************************
-//
-// Extern Declarations
-//
-//*********************************************************
-extern char **gettoks();
-
-//*********************************************************
-//
-// Function Prototypes
-//
-//*********************************************************
-bool isInternal(char **toks);
-void handleExternal(char **toks);
-bool isBackground(char **toks);
-void excuteCommand(char **toks);
-
-//*********************************************************
-//
 // Global variables
 //
 //*********************************************************
@@ -129,9 +104,9 @@ bool isInternal(char **toks) {
   }  else if (strcmp(command, "forweb") == 0) {
     forweb(toks);
   } else if (strcmp(command, "nls") == 0) {
-    printf("%s\n", command);
+    nls(toks);
   } else if (strcmp(command, "fil") == 0) {
-    printf("%s\n", command);
+    fil(toks);
   } else {
     flag = false;
   }
