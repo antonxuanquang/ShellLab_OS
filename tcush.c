@@ -39,8 +39,12 @@ int main(int argc, char *argv[]) {
   int ii;
   char **toks;
   int retval;
+  int input;
+  int output;
   char *prompt;
   char *username;
+  char *output_filename;
+  char *input_filename;
 
   if ((username = getlogin()) == NULL) {
     fprintf(stderr, "Get of user information failed.\n"); exit(1);
@@ -71,11 +75,37 @@ int main(int argc, char *argv[]) {
     }
 
     // Check redirected input
+    input = redirect_input(toks, &input_filename);
+
+    switch(input) {
+    case -1:
+      printf("Syntax error!\n");
+      continue;
+      break;
+    case 0:
+      break;
+    case 1:
+      printf("Redirecting input from: %s\n", input_filename);
+      break;
+    }
 
     // Check redirected output
+    output = redirect_output(toks, &output_filename);
+
+    switch(output) {
+    case -1:
+      printf("Syntax error!\n");
+      continue;
+      break;
+    case 0:
+      break;
+    case 1:
+      printf("Redirecting output to: %s\n", output_filename);
+      break;
+    }
 
     push_command(&history_list, join_tokens(toks));
-    handleExternal(toks);
+    handleExternal(toks, input, input_filename, output, output_filename);
 
     // simple loop to echo all arguments
 	  // for( ii=0; toks[ii] != NULL; ii++ ) {
@@ -106,7 +136,8 @@ bool handleInternal(char **toks) {
   return isInternal;
 }
 
-void handleExternal(char **toks) {
+void handleExternal(char **toks, int input, char *input_filename, int output,
+                    char *output_filename) {
   int pid = fork();
 
   // when can't fork more processes
@@ -115,19 +146,18 @@ void handleExternal(char **toks) {
     return;
   }
 
-  // in background
-  if (isBackground(toks)) {
-    if (pid == 0) {
-      excuteCommand(toks);
-    }
-  // in foreground
-  } else {
-    if (pid == 0) {
-      excuteCommand(toks);
-    } else if (pid > 0){
-      int status;
-      waitpid(pid, &status, 0);
-    }
+  if (pid == 0) {
+    // set up redirections
+    if (input) freopen(input_filename, "r", stdin);
+    if (output) freopen(output_filename, "w+", stdout);
+
+    excuteCommand(toks);
+    exit(-1);
+  }
+
+  if (!isBackground(toks) && pid > 0) {
+    int status;
+    waitpid(pid, &status, 0);
   }
 }
 

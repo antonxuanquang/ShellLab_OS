@@ -3,6 +3,7 @@
 #include "forweb.h"
 #include "nls.h"
 #include "fil.h"
+#include "pipe.h"
 
 //*********************************************************
 //
@@ -23,6 +24,7 @@ extern char **gettoks();
 //
 //*********************************************************
 bool handleInternal(char **toks);
-void handleExternal(char **toks);
+void handleExternal(char **toks, int input, char *input_filename, int output,
+               char *output_filename);
 bool isBackground(char **toks);
 void excuteCommand(char **toks);
