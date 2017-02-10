@@ -76,12 +76,6 @@ int main(int argc, char *argv[]) {
 
     toks = appendHistoryCommand(history_list, toks);
 
-    if (toks != NULL) {
-      for( ii=0; toks[ii] != NULL; ii++ ) {
-        printf( "Argument %d: %s\n", ii, toks[ii] );
-      }
-    }
-
     push_command(&history_list, toks);
 
     // Handle internal commands
