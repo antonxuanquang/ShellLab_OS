@@ -69,6 +69,21 @@ int main(int argc, char *argv[]) {
     if (toks[0] == NULL) continue; // No input
     if (strcmp(toks[0], STRMYQUIT) == 0) break; // Dr. Scherger wants out!
 
+    // simple loop to echo all arguments
+    // for( ii=0; toks[ii] != NULL; ii++ ) {
+    //   printf( "Argument %d: %s\n", ii, toks[ii] );
+    // }
+
+    toks = appendHistoryCommand(history_list, toks);
+
+    if (toks != NULL) {
+      for( ii=0; toks[ii] != NULL; ii++ ) {
+        printf( "Argument %d: %s\n", ii, toks[ii] );
+      }
+    }
+
+    push_command(&history_list, toks);
+
     // Handle internal commands
     if (handleInternal(toks)) {
       continue;
@@ -104,13 +119,10 @@ int main(int argc, char *argv[]) {
       break;
     }
 
-    push_command(&history_list, join_tokens(toks));
+    
     handleExternal(toks, input, input_filename, output, output_filename);
 
-    // simple loop to echo all arguments
-	  // for( ii=0; toks[ii] != NULL; ii++ ) {
-    //   printf( "Argument %d: %s\n", ii, toks[ii] );
-    // }
+    
   }
 
   /* return to calling environment */
@@ -146,6 +158,8 @@ void handleExternal(char **toks, int input, char *input_filename, int output,
     return;
   }
 
+  bool background = isBackground(toks);
+
   if (pid == 0) {
     // set up redirections
     if (input) freopen(input_filename, "r", stdin);
@@ -155,7 +169,7 @@ void handleExternal(char **toks, int input, char *input_filename, int output,
     exit(-1);
   }
 
-  if (!isBackground(toks) && pid > 0) {
+  if (!background && pid > 0) {
     int status;
     waitpid(pid, &status, 0);
   }
