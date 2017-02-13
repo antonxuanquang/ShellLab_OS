@@ -1,4 +1,10 @@
 #include "fil.h"
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+#include <ctype.h>
+#include <unistd.h>
+
 
 // private function proto
 int readLine(int fh_in, char* line);

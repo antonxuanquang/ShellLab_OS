@@ -53,8 +53,6 @@ bool isBackground(char **toks);
 void excuteCommand(char **toks);
 
 
-
-
 //*********************************************************
 //
 // Global variables

@@ -1,4 +1,9 @@
-#include "forweb.h"
+#include "forweb.h" 
+#include <sys/stat.h>
+#include <ftw.h>
+#include <stdio.h>
+#include <string.h>
+
 
 // private function proto
 // void change_permission_rec(char *name);

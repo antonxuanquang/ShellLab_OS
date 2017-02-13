@@ -4,6 +4,7 @@ var watch = require('gulp-watch')
 
 gulp.task('compile', shell.task([
   'clear',
+  'make clean',
   'make',
 ]))
 

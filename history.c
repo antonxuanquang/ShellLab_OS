@@ -1,4 +1,7 @@
 #include "history.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 // private function proto
 char **copy_toks(char **toks);

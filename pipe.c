@@ -1,4 +1,6 @@
 #include "pipe.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 // Check for input redirection
 int redirect_input(char **args, char **input_filename) {
