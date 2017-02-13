@@ -1,5 +1,10 @@
 #include "history.h"
 
+// private function proto
+char **copy_toks(char **toks);
+char **append_toks(char **new_toks, char **toks);
+char *join_tokens(char **toks);
+
 void push_command(struct history_node** head_ref, char **toks) {
 	struct history_node *new_node = (struct history_node*) malloc(sizeof(struct history_node));
 	if ((*head_ref) == NULL) {

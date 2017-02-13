@@ -1,8 +1,8 @@
 #include "forweb.h"
 
-/*
-	
-*/
+// private function proto
+// void change_permission_rec(char *name);
+int list(const char *name, const struct stat *status, int type);
 
 void forweb(char **toks) {
 	// if (toks[1] == NULL) {

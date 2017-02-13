@@ -19,9 +19,41 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#include "main.h"
 
+#include "common.h"
+#include "history.h"
+#include "forweb.h"
+#include "nls.h"
+#include "fil.h"
+#include "pipe.h"
 #define STRMYQUIT "myquit"
+
+//*********************************************************
+//
+// Type Declarations
+//
+//*********************************************************
+
+//*********************************************************
+//
+// Extern Declarations
+//
+//*********************************************************
+extern char **gettoks();
+
+//*********************************************************
+//
+// Function Prototypes
+//
+//*********************************************************
+bool handleInternal(char **toks);
+void handleExternal(char **toks, int input, char *input_filename, int output,
+               char *output_filename);
+bool isBackground(char **toks);
+void excuteCommand(char **toks);
+
+
+
 
 //*********************************************************
 //
@@ -115,8 +147,6 @@ int main(int argc, char *argv[]) {
 
     
     handleExternal(toks, input, input_filename, output, output_filename);
-
-    
   }
 
   /* return to calling environment */

@@ -1,5 +1,9 @@
 #include "fil.h"
 
+// private function proto
+int readLine(int fh_in, char* line);
+char *trimWhiteSpace(char *str);
+
 void fil(char **toks) {
 	int LINE_SIZE = 132;
 	size_t BUFFER_SIZE = 1024;
