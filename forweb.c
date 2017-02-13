@@ -12,14 +12,14 @@ void forweb(char **toks) {
 	// }
 	if (toks[1] == NULL) {
 		ftw(".", list, 1);
-	} else {
-		ftw(toks[1], list, 1);
+	} else if (ftw(toks[1], list, 1) == -1){
+		printf("Can't open folder '%s'\n", toks[1]);
 	}
 }
 
 int list(const char *name, const struct stat *status, int type) {
 	if(type == FTW_NS)
-		return 0;
+		return -1;
 
 	if(type == FTW_F) {
 		// printf("0%3o\t%s\n", status->st_mode&0777, name);

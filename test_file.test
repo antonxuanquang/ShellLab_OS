@@ -1,8 +1,0 @@
-echo "Test foreground"
-ls
-echo ''
-echo ''
-echo ''
-echo "Test background"
-myquit
-EOF

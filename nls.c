@@ -43,4 +43,4 @@ void nls(char **toks) {
 		printf("Folder not found. Please give correct folder name\n");
 	}
 	closedir(dir);
-}
+}         
