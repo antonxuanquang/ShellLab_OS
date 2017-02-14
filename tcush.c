@@ -19,6 +19,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 #include "common.h"
 #include "history.h"
@@ -123,9 +124,6 @@ int main(int argc, char *argv[]) {
       break;
     case 0:
       break;
-    case 1:
-      printf("Redirecting input from: %s\n", input_filename);
-      break;
     }
 
     // Check redirected output
@@ -137,9 +135,6 @@ int main(int argc, char *argv[]) {
       continue;
       break;
     case 0:
-      break;
-    case 1:
-      printf("Redirecting output to: %s\n", output_filename);
       break;
     }
 
@@ -183,9 +178,27 @@ void handleExternal(char **toks, int input, char *input_filename, int output,
   bool background = isBackground(toks);
 
   if (pid == 0) {
+    int fh_in;
+    int fh_out;
+
     // set up redirections
-    if (input) freopen(input_filename, "r", stdin);
-    if (output) freopen(output_filename, "w+", stdout);
+    if (input) {
+      if ((fh_in = open(input_filename, O_RDONLY)) == -1) {
+        printf("Can't open %s file\n", input_filename);
+        return;
+      } else {
+        dup2(fh_in, 0);
+      }
+    }  
+    if (output) {
+      if ((fh_out = open(output_filename, O_WRONLY | O_CREAT | O_TRUNC, 
+                      S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1) {
+        printf("Can't open %s file\n", output_filename);
+        return;
+      } else {
+        dup2(fh_out, 1);
+      }
+    }
 
     excuteCommand(toks);
     exit(-1);
