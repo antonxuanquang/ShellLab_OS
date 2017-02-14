@@ -4,7 +4,8 @@
 
 // Check for input redirection
 int redirect_input(char **args, char **input_filename) {
-  for(int i = 0; args[i] != NULL; i++) {
+  int i;
+  for(i = 0; args[i] != NULL; i++) {
 
     // Look for the <
     if(args[i][0] == '<') {
@@ -16,9 +17,9 @@ int redirect_input(char **args, char **input_filename) {
       } else {
 	       return -1;
       }
-
+      int j; 
       // Adjust the rest of the arguments in the array
-      for(int j = i; args[j-1] != NULL; j++) {
+      for(j = i; args[j-1] != NULL; j++) {
 	       args[j] = args[j+2];
       }
 
@@ -30,7 +31,8 @@ int redirect_input(char **args, char **input_filename) {
 }
 
 int redirect_output(char **args, char **output_filename) {
-  for(int i = 0; args[i] != NULL; i++) {
+  int i;
+  for(i = 0; args[i] != NULL; i++) {
 
     // Look for the >
     if(args[i][0] == '>') {
@@ -42,9 +44,9 @@ int redirect_output(char **args, char **output_filename) {
       } else {
 	       return -1;
       }
-
+      int j;
       // Adjust the rest of the arguments in the array
-      for(int j = i; args[j-1] != NULL; j++) {
+      for(j = i; args[j-1] != NULL; j++) {
 	       args[j] = args[j+2];
       }
 

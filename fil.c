@@ -5,7 +5,6 @@
 #include <ctype.h>
 #include <unistd.h>
 
-
 // private function proto
 int readLine(int fh_in, char* line);
 char *trimWhiteSpace(char *str);
@@ -20,18 +19,23 @@ void fil(char **toks) {
 	int line_count = 0;
 	int character_count = 0;
 
-	if (toks[1] == NULL || toks[2] == NULL) {
-		printf("usage: %s [from] [to]\n", toks[0]);
-	}
 	
+	if (toks[1] == NULL && toks[2] == NULL) {
+		printf("usage: %s [from] [to]\n", toks[0]);
+		return;
+	}
 
 	// should be able to open 'from' and 'to' files
-	if((fh_in = open(toks[1], O_RDONLY)) == -1) {
+	if (strcmp(toks[1], "-") == 0) {
+		fh_in = 0;
+	} else if((fh_in = open(toks[1], O_RDONLY)) == -1) {
 		printf("Can't open %s file\n", toks[1]);
 		return;
 	}
 
-	if((fh_out = open(toks[2], O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1) {
+	if (toks[2] == NULL) {
+		fh_out = 1;
+	} else if((fh_out = open(toks[2], O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1) {
 		printf("Can't open %s file\n", toks[2]);
 		return;
 	}
@@ -82,8 +86,12 @@ void fil(char **toks) {
 		}
 	}
 
-	close(fh_in);
-	close(fh_out);
+	if (fh_in != 0) {
+		close(fh_in);
+	}
+	if (fh_out != 1) {
+		close(fh_out);
+	}
 }
 
 int readLine(int fh_in, char* line) {
