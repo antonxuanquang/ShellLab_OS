@@ -48,8 +48,7 @@ extern char **gettoks();
 //
 //*********************************************************
 bool handleInternal(char **toks);
-void handleExternal(char **toks, int input, char *input_filename, int output,
-               char *output_filename);
+void handleExternal(char **toks);
 bool isBackground(char **toks);
 void excuteCommand(char **toks);
 
@@ -74,8 +73,6 @@ int main(int argc, char *argv[]) {
   int output;
   char *prompt;
   char *username;
-  char *output_filename;
-  char *input_filename;
 
   if ((username = getlogin()) == NULL) {
     fprintf(stderr, "Get of user information failed.\n"); exit(1);
@@ -106,7 +103,6 @@ int main(int argc, char *argv[]) {
     // }
 
     toks = appendHistoryCommand(history_list, toks);
-
     push_command(&history_list, toks);
 
     // Handle internal commands
@@ -114,32 +110,9 @@ int main(int argc, char *argv[]) {
       continue;
     }
 
-    // Check redirected input
-    input = redirect_input(toks, &input_filename);
-
-    switch(input) {
-    case -1:
-      printf("Syntax error!\n");
-      continue;
-      break;
-    case 0:
-      break;
-    }
-
-    // Check redirected output
-    output = redirect_output(toks, &output_filename);
-
-    switch(output) {
-    case -1:
-      printf("Syntax error!\n");
-      continue;
-      break;
-    case 0:
-      break;
-    }
-
     
-    handleExternal(toks, input, input_filename, output, output_filename);
+
+    handleExternal(toks);
   }
 
   /* return to calling environment */
@@ -165,8 +138,7 @@ bool handleInternal(char **toks) {
   return isInternal;
 }
 
-void handleExternal(char **toks, int input, char *input_filename, int output,
-                    char *output_filename) {
+void handleExternal(char **toks) {
   int pid = fork();
 
   // when can't fork more processes
@@ -178,8 +150,20 @@ void handleExternal(char **toks, int input, char *input_filename, int output,
   bool background = isBackground(toks);
 
   if (pid == 0) {
-    int fh_in;
-    int fh_out;
+    int fh_in, fh_out, input, output, is_pipe;
+    char *output_filename;
+    char *input_filename;
+    char **pipe_toks;
+
+    // Check redirected input, output
+    input = redirect_input(toks, &input_filename);
+    output = redirect_output(toks, &output_filename);
+    is_pipe = do_pipe(toks, &pipe_toks);
+
+    if (input == -1 || output == -1) {
+      printf("File redirect: systax error\n");
+      return;
+    }
 
     // set up redirections
     if (input) {
@@ -189,7 +173,7 @@ void handleExternal(char **toks, int input, char *input_filename, int output,
       } else {
         dup2(fh_in, 0);
       }
-    }  
+    }
     if (output) {
       if ((fh_out = open(output_filename, O_WRONLY | O_CREAT | O_TRUNC, 
                       S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH)) == -1) {
@@ -199,9 +183,23 @@ void handleExternal(char **toks, int input, char *input_filename, int output,
         dup2(fh_out, 1);
       }
     }
+    
+    if (is_pipe) {
+      int pfds[2];
+      pipe(pfds);
+      if (!fork()) {    /* child will execute command before pipe (|)*/
+        close(1);       /* close normal stdout */
+        dup(pfds[1]);   /* make stdout same as pfds[1] */
+        close(pfds[0]); /* we don't need this */
+      } else {          /* parent will execute command after pipe (|)*/
+        close(0);       /* close normal stdin */
+        dup(pfds[0]);   /* make stdin same as pfds[0] */
+        close(pfds[1]); /* we don't need this */
+        excuteCommand(pipe_toks);
+      }
+    }
 
     excuteCommand(toks);
-    exit(-1);
   }
 
   if (!background && pid > 0) {
@@ -230,4 +228,5 @@ bool isBackground(char **toks) {
 void excuteCommand(char **toks) {
   execvp(toks[0], toks);
   printf("%s -- Command not found\n", toks[0]);
+  exit(-1);
 }

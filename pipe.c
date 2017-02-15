@@ -1,6 +1,7 @@
 #include "pipe.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 // Check for input redirection
 int redirect_input(char **args, char **input_filename) {
@@ -54,5 +55,17 @@ int redirect_output(char **args, char **output_filename) {
     }
   }
 
+  return 0;
+}
+
+int do_pipe(char **toks, char ***pipe_toks) {
+  int i;
+  for (int i = 0; toks[i] != NULL; i++) {
+    if (strcmp(toks[i], "|") == 0) {
+      *pipe_toks = toks + (i + 1);
+      toks[i] = NULL;
+      return 1;
+    }
+  }
   return 0;
 }
