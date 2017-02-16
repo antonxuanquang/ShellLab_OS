@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
   retval = 0;
 
   /* put signal catching functions here */
-  // signal(SIGINT, SIG_IGN);
+  signal(SIGINT, SIG_IGN);
   signal(SIGTSTP, SIG_IGN);
   signal(SIGQUIT, SIG_IGN);
 

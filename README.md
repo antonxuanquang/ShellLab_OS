@@ -79,3 +79,6 @@ Internal commands won't handle file redirection: <, >, |
 history > out.txt
 nls . | wc
 ~~~
+
+###Backgroun process:
+Internal commands won't work in background
