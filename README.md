@@ -26,10 +26,10 @@ history
 ###fil
 The fil command works as follows:
 1. All tabs are replaced by an equivalent number of spaces.
-2. All trailing blanks at the end of each line are removed.
-3. All lines longer than 132 characters are folded.
-4. A form fed is added for every 66 lines from the previous form feed.
-5. All BACKSPACE and nonprinting characters are removed.
+1. All trailing blanks at the end of each line are removed.
+1. All lines longer than 132 characters are folded.
+1. A form fed is added for every 66 lines from the previous form feed.
+1. All BACKSPACE and nonprinting characters are removed.
 
 Syntax:
 ```
