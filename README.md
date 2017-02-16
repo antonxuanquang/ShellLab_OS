@@ -70,9 +70,10 @@ Limitation
 ###Chains of pipes: 
 The shell can't do the following command:
 ```
-~~ls | wc | wc~~
+ls | wc | wc
 ```
 
+###File redirections: 
 Internal commands won't handle file redirection: <, >, |
 ~~~
 history > out.txt
