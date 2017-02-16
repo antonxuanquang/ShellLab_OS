@@ -97,22 +97,14 @@ int main(int argc, char *argv[]) {
     if (toks[0] == NULL) continue; // No input
     if (strcmp(toks[0], STRMYQUIT) == 0) break; // Dr. Scherger wants out!
 
-    // simple loop to echo all arguments
-    // for( ii=0; toks[ii] != NULL; ii++ ) {
-    //   printf( "Argument %d: %s\n", ii, toks[ii] );
-    // }
-
     toks = appendHistoryCommand(history_list, toks);
     push_command(&history_list, toks);
 
     // Handle internal commands
-    if (handleInternal(toks)) {
-      continue;
+    if (!handleInternal(toks)) {
+      handleExternal(toks);
     }
-
     
-
-    handleExternal(toks);
   }
 
   /* return to calling environment */
