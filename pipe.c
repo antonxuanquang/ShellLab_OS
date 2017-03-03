@@ -60,7 +60,7 @@ int redirect_output(char **args, char **output_filename) {
 
 int do_pipe(char **toks, char ***pipe_toks) {
   int i;
-  for (int i = 0; toks[i] != NULL; i++) {
+  for (i = 0; toks[i] != NULL; i++) {
     if (strcmp(toks[i], "|") == 0) {
       *pipe_toks = toks + (i + 1);
       toks[i] = NULL;
